@@ -15,7 +15,7 @@
   --color-ink: #16231a; /* main text */
   --color-ink-soft: #55604f; /* secondary text */
   --color-line: #dfe6d6; /* hairlines / borders */
-  --color-mist: #edf2e5; /* light green tint — panels, image placeholders */
+  --color-mist: #e7tfd9; /* light green tint — panels, image placeholders */
 
   --font-sans: var(--font-geist-sans);
 }

@@ -7,19 +7,27 @@ import {
   useState,
   type MouseEvent,
   type PointerEvent,
+  type ReactNode,
 } from "react";
 import type { Post } from "@/lib/api/types";
-import { getYouTubeId, youTubeEmbedUrl, youTubeThumbnail } from "@/lib/embeds";
+import {
+  facebookVideoEmbedUrl,
+  getEmbedProvider,
+  getYouTubeId,
+  youTubeEmbedUrl,
+  youTubeThumbnail,
+  type EmbedProvider,
+} from "@/lib/embeds";
 import { formatDate } from "@/lib/format";
 
 const DRAG_THRESHOLD = 60; // px needed to move to the next/previous slide
-const AUTOPLAY_MS = 20000; // auto-advance every 20s, unless paused
+const AUTOPLAY_MS = 8000; // auto-advance every 8s, unless paused
 
 /**
  * Rotating showcase of the latest posts. One post is shown at a time; arrows,
- * dots, or dragging sideways (mouse or touch) move between them. A post with a
- * YouTube video plays inline when clicked; any other post links to its page
- * under /novidades.
+ * dots, or dragging sideways (mouse or touch) move between them. YouTube and
+ * Facebook videos play inline when clicked; Instagram opens the original post
+ * in a new tab; any other post links to its page under /novidades.
  */
 export function PostCarousel({ posts }: { posts: Post[] }) {
   const [index, setIndex] = useState(0);
@@ -190,7 +198,9 @@ function PostSlide({
   playing: boolean;
   onPlay: () => void;
 }) {
-  const youTubeId = post.embed_url ? getYouTubeId(post.embed_url) : null;
+  const provider = post.embed_url ? getEmbedProvider(post.embed_url) : null;
+  const youTubeId =
+    provider === "youtube" ? getYouTubeId(post.embed_url!) : null;
   const href = `/novidades/${post.id}`;
 
   return (
@@ -199,6 +209,7 @@ function PostSlide({
         <PostMedia
           post={post}
           href={href}
+          provider={provider}
           youTubeId={youTubeId}
           playing={playing}
           onPlay={onPlay}
@@ -224,33 +235,33 @@ const MEDIA_BOX = "relative aspect-[16/10] overflow-hidden rounded-2xl bg-mist";
 function PostMedia({
   post,
   href,
+  provider,
   youTubeId,
   playing,
   onPlay,
 }: {
   post: Post;
   href: string;
+  provider: EmbedProvider;
   youTubeId: string | null;
   playing: boolean;
   onPlay: () => void;
 }) {
-  // A YouTube post already playing: show the player.
-  if (youTubeId && playing) {
-    return (
-      <div className={MEDIA_BOX}>
-        <iframe
-          src={youTubeEmbedUrl(youTubeId)}
-          title={post.title}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full"
-        />
-      </div>
-    );
-  }
-
-  // A YouTube post not yet playing: thumbnail with a play button.
-  if (youTubeId) {
+  // YouTube: known thumbnail API, so the poster needs no image from the post.
+  if (provider === "youtube" && youTubeId) {
+    if (playing) {
+      return (
+        <div className={MEDIA_BOX}>
+          <iframe
+            src={youTubeEmbedUrl(youTubeId)}
+            title={post.title}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+      );
+    }
     return (
       <button
         type="button"
@@ -258,42 +269,71 @@ function PostMedia({
         aria-label={`Reproduzir vídeo: ${post.title}`}
         className={`${MEDIA_BOX} group block w-full`}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={youTubeThumbnail(youTubeId)}
-          alt=""
-          draggable={false}
-          className="h-full w-full object-cover"
-        />
-        <span className="absolute inset-0 flex items-center justify-center">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition group-hover:scale-105">
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="ml-1 text-primary"
-              aria-hidden="true"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </span>
-        </span>
+        <MediaPoster imageUrl={youTubeThumbnail(youTubeId)} />
+        <CenterGlyph>
+          <PlayIcon />
+        </CenterGlyph>
       </button>
     );
   }
 
-  // A post with a photo: the image links to the post's page.
+  // Facebook: public videos also embed without an API key, but there is no
+  // thumbnail API like YouTube's, so the post's own image (if set) is used
+  // as the poster instead — a badge marks it as a Facebook video either way.
+  if (provider === "facebook" && post.embed_url) {
+    if (playing) {
+      return (
+        <div className={MEDIA_BOX}>
+          <iframe
+            src={facebookVideoEmbedUrl(post.embed_url)}
+            title={post.title}
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+      );
+    }
+    return (
+      <button
+        type="button"
+        onClick={onPlay}
+        aria-label={`Reproduzir vídeo: ${post.title}`}
+        className={`${MEDIA_BOX} group block w-full`}
+      >
+        <MediaPoster imageUrl={post.image_url} />
+        <CenterGlyph>
+          <PlayIcon />
+        </CenterGlyph>
+        <ProviderBadge label="Facebook" />
+      </button>
+    );
+  }
+
+  // Instagram dropped key-free embedding, so this links out to the original
+  // post in a new tab instead of trying to play it in place.
+  if (provider === "instagram" && post.embed_url) {
+    return (
+      <a
+        href={post.embed_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${MEDIA_BOX} group block w-full`}
+      >
+        <MediaPoster imageUrl={post.image_url} />
+        <CenterGlyph>
+          <ExternalLinkIcon />
+        </CenterGlyph>
+        <ProviderBadge label="Instagram" />
+      </a>
+    );
+  }
+
+  // A post with a photo (no video): the image links to the post's page.
   if (post.image_url) {
     return (
       <Link href={href} className={`${MEDIA_BOX} block`} draggable={false}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={post.image_url}
-          alt={post.title}
-          draggable={false}
-          className="h-full w-full object-cover"
-        />
+        <MediaPoster imageUrl={post.image_url} alt={post.title} />
       </Link>
     );
   }
@@ -301,14 +341,102 @@ function PostMedia({
   // A text-only post: a plain placeholder that links to the post's page.
   return (
     <Link href={href} className={`${MEDIA_BOX} flex items-center justify-center`}>
-      <svg
-        viewBox="0 0 100 100"
-        className="w-1/4 text-primary/25"
-        fill="currentColor"
-        aria-hidden="true"
-      >
-        <path d="M50 8C30 20 18 40 22 66c2 14 12 24 26 26 0-24-2-44-14-60 18 10 30 28 30 52 14-6 22-22 20-40C102 30 78 14 50 8Z" />
-      </svg>
+      <LeafIcon />
     </Link>
+  );
+}
+
+/** Fills the media box with the post's image, or a leaf placeholder if unset. */
+function MediaPoster({
+  imageUrl,
+  alt = "",
+}: {
+  imageUrl: string | null;
+  alt?: string;
+}) {
+  if (imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={imageUrl}
+        alt={alt}
+        draggable={false}
+        className="h-full w-full object-cover"
+      />
+    );
+  }
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <LeafIcon />
+    </div>
+  );
+}
+
+/** Centers an icon button (play / external-link) over the media box. */
+function CenterGlyph({ children }: { children: ReactNode }) {
+  return (
+    <span className="absolute inset-0 flex items-center justify-center">
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition group-hover:scale-105">
+        {children}
+      </span>
+    </span>
+  );
+}
+
+/** Small pill naming the source platform, for embeds without a native thumbnail. */
+function ProviderBadge({ label }: { label: string }) {
+  return (
+    <span className="absolute bottom-3 left-3 z-10 rounded-full border border-line bg-white/85 px-2.5 py-1 text-xs font-semibold text-ink-soft">
+      {label}
+    </span>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="ml-1 text-primary"
+      aria-hidden="true"
+    >
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-primary"
+      aria-hidden="true"
+    >
+      <path d="M14 4h6v6" />
+      <path d="M20 4L11 13" />
+      <path d="M19 14v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
+    </svg>
+  );
+}
+
+function LeafIcon() {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      className="w-1/4 text-primary/25"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M50 8C30 20 18 40 22 66c2 14 12 24 26 26 0-24-2-44-14-60 18 10 30 28 30 52 14-6 22-22 20-40C102 30 78 14 50 8Z" />
+    </svg>
   );
 }
