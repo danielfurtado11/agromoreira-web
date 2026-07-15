@@ -1,24 +1,29 @@
-// Temporary Phase 1 verification page.
-// It is a Server Component (async): the fetch runs on the Next server, which
-// calls the API. This is replaced by the real homepage in Phase 2.
-import { getCategories, getProducts } from "@/lib/api/queries";
+// Homepage — work in progress (Phase 2).
+// For now it renders the featured & discounted products; the other sections
+// (posts carousel, categories, header/footer) are added in the next steps.
+import { getProducts } from "@/lib/api/queries";
+import { ProductCard } from "@/components/ProductCard";
 
 export default async function Home() {
-  const [products, categories] = await Promise.all([
-    getProducts(),
-    getCategories(),
-  ]);
+  const products = await getProducts();
+  const highlights = products.filter(
+    (product) => product.is_featured || product.discount_price != null,
+  );
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-      <h1 className="text-4xl font-bold tracking-tight">Agromoreira</h1>
-      <p className="text-lg text-zinc-600 dark:text-zinc-400">
-        Ligação à API a funcionar 🎉
-      </p>
-      <p className="text-sm text-zinc-500">
-        {products.length} produtos · {categories.length} categorias vindos de{" "}
-        {process.env.NEXT_PUBLIC_API_URL}
-      </p>
+    <main className="mx-auto w-full max-w-[1440px] px-6 py-12">
+      <header className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-widest text-accent-ink">
+          Em destaque &amp; promoções
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight">Escolhas da casa</h1>
+      </header>
+
+      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {highlights.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
     </main>
   );
 }

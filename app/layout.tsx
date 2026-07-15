@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agromoreira",
-  description: "Loja de produtos animais e agrícolas",
+  title: "AgroMoreira's · AgroFontaínhas",
+  description:
+    "Agricultura, ferragens, rações e produtos de limpeza — empresa familiar ao serviço da região há mais de 30 anos.",
 };
 
 export default function RootLayout({
@@ -27,7 +30,11 @@ export default function RootLayout({
       lang="pt-PT"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Header />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }

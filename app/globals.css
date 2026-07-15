@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Brand design tokens, taken from the AgroMoreira's logo.
+ * Declared in Tailwind's @theme so they become utilities: bg-primary,
+ * text-accent, border-line, etc. The site is light-only (always white).
+ */
+@theme {
+  --color-primary: #1e5631; /* forest green — buttons, headings, nav */
+  --color-primary-deep: #123b21; /* hover / darker green */
+  --color-accent: #8dbe3d; /* lime green (the leaves) — highlights, sale tags */
+  --color-accent-soft: #eaf3d6; /* lime tint — notice banners */
+  --color-accent-ink: #3c5a16; /* readable green on lime */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: #16231a; /* main text */
+  --color-ink-soft: #55604f; /* secondary text */
+  --color-line: #dfe6d6; /* hairlines / borders */
+  --color-mist: #edf2e5; /* light green tint — panels, image placeholders */
+
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+}
+
+/*
+ * Header logo crossfade. Two logos are stacked; the top one (AgroFontaínhas)
+ * fades in and out over the bottom one (AgroMoreira's), alternating the brand
+ * on display. Disabled when the visitor prefers reduced motion.
+ */
+@keyframes logo-crossfade {
+  0%,
+  42% {
+    opacity: 0;
+  }
+  50%,
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.logo-crossfade-top {
+  animation: logo-crossfade 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-crossfade-top {
+    animation: none;
+    opacity: 0;
+  }
 }

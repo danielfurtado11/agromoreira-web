@@ -1,7 +1,14 @@
 // Per-resource functions: each one knows its endpoint path and return type.
 // Pages call these instead of using `fetch` directly.
 import { apiFetch } from "./client";
-import type { Category, Post, Product, ProductDetail } from "./types";
+import type {
+  AboutUs,
+  Category,
+  Post,
+  Product,
+  ProductDetail,
+  Store,
+} from "./types";
 
 /** Public catalogue products, with optional filters. */
 export function getProducts(params?: {
@@ -29,4 +36,14 @@ export function getCategories(): Promise<Category[]> {
 /** News feed posts. */
 export function getPosts(): Promise<Post[]> {
   return apiFetch<Post[]>("/posts");
+}
+
+/** Physical stores, with address and opening hours. */
+export function getStores(): Promise<Store[]> {
+  return apiFetch<Store[]>("/stores");
+}
+
+/** The single "about us" record: description text, contacts and social links. */
+export function getAboutUs(): Promise<AboutUs> {
+  return apiFetch<AboutUs>("/about-us");
 }
