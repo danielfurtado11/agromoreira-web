@@ -21,6 +21,7 @@ import {
 import { formatDate } from "@/lib/format";
 
 const DRAG_THRESHOLD = 60; // px needed to move to the next/previous slide
+const CLICK_JITTER_THRESHOLD = 15; // px of movement still treated as a click, not a drag
 const AUTOPLAY_MS = 8000; // auto-advance every 8s, unless paused
 
 /**
@@ -63,13 +64,23 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
     dragStartX.current = event.clientX;
     didDrag.current = false;
     setIsDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
+    // Pointer capture is NOT taken here. Capturing immediately would
+    // redirect the eventual click (and mouse events) to this wrapper for
+    // every press, even a plain click on a child button — so a tap on the
+    // video's play button would never reach it. It is taken lazily, below,
+    // only once real drag movement is confirmed.
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     if (dragStartX.current === null) return;
     const dx = event.clientX - dragStartX.current;
-    if (Math.abs(dx) > 5) didDrag.current = true;
+    if (!didDrag.current && Math.abs(dx) > CLICK_JITTER_THRESHOLD) {
+      didDrag.current = true;
+      // Now that this is a confirmed drag, capture the pointer so move/up
+      // keep being reported to this element even if the cursor leaves it
+      // (e.g. a fast swipe past the carousel's edge).
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
     setDragDx(dx);
   }
 
