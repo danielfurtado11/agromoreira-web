@@ -1,29 +1,72 @@
-// Homepage — work in progress (Phase 2).
-// For now it renders the featured & discounted products; the other sections
-// (posts carousel, categories, header/footer) are added in the next steps.
-import { getProducts } from "@/lib/api/queries";
+// Homepage. Order: latest posts → featured & discounted products → categories.
+import Link from "next/link";
+import { getCategories, getPosts, getProducts } from "@/lib/api/queries";
+import { CategoryCard } from "@/components/CategoryCard";
+import { PostCarousel } from "@/components/PostCarousel";
 import { ProductCard } from "@/components/ProductCard";
+import { SectionHeading } from "@/components/SectionHeading";
 
 export default async function Home() {
-  const products = await getProducts();
+  const [posts, products, categories] = await Promise.all([
+    getPosts(),
+    getProducts(),
+    getCategories(),
+  ]);
+
+  const recentPosts = posts.slice(0, 5);
   const highlights = products.filter(
     (product) => product.is_featured || product.discount_price != null,
   );
 
   return (
-    <main className="mx-auto w-full max-w-[1440px] px-6 py-12">
-      <header className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-accent-ink">
-          Em destaque &amp; promoções
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight">Escolhas da casa</h1>
-      </header>
+    <div className="mx-auto w-full max-w-[1800px] px-6">
+      {/* Visually hidden page title for SEO / screen readers. */}
+      <h1 className="sr-only">
+        AgroMoreira&apos;s — agricultura, ferragens, rações e produtos de limpeza
+      </h1>
 
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {highlights.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
-    </main>
+      {recentPosts.length > 0 && (
+        <section className="py-10">
+          <div className="mb-4 flex justify-end">
+            <Link
+              href="/novidades"
+              className="group inline-flex items-center gap-1 text-sm font-semibold text-primary"
+            >
+              Todas as novidades
+              <span className="transition-transform group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
+          </div>
+          <PostCarousel posts={recentPosts} />
+        </section>
+      )}
+
+      <section className="border-t border-line py-12">
+        <SectionHeading
+          eyebrow="Em destaque & promoções"
+          title="Escolhas da casa"
+          link={{ href: "/produtos", label: "Ver catálogo" }}
+        />
+        <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {highlights.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="border-t border-line py-12">
+        <SectionHeading
+          eyebrow="Categorias"
+          title="Encontre o que precisa"
+          link={{ href: "/produtos", label: "Ver tudo" }}
+        />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {categories.map((category) => (
+            <CategoryCard key={category.id} category={category} />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

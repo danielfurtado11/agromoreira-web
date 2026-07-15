@@ -21,22 +21,36 @@
 }
 
 body {
-  background: #ffffff;
+  background: #f4f7ee; /* soft green-tinted off-white, so cards stand out */
   color: var(--color-ink);
 }
 
 /*
- * Header logo crossfade. Two logos are stacked; the top one (AgroFontaínhas)
- * fades in and out over the bottom one (AgroMoreira's), alternating the brand
- * on display. Disabled when the visitor prefers reduced motion.
+ * Header logos alternate between the company's two brands with a seamless
+ * crossfade. The logos overlap during the transition, and the loop is closed
+ * so the animation can restart without a blank reset.
  */
-@keyframes logo-crossfade {
+@keyframes logo-fade-a {
   0%,
-  42% {
+  45% {
+    opacity: 1;
+  }
+  55%,
+  95% {
     opacity: 0;
   }
-  50%,
-  92% {
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes logo-fade-b {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  55%,
+  95% {
     opacity: 1;
   }
   100% {
@@ -44,12 +58,20 @@ body {
   }
 }
 
-.logo-crossfade-top {
-  animation: logo-crossfade 9s ease-in-out infinite;
+.logo-a {
+  animation: logo-fade-a 12s ease-in-out infinite;
+}
+
+.logo-b {
+  animation: logo-fade-b 12s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-crossfade-top {
+  .logo-a {
+    animation: none;
+    opacity: 1;
+  }
+  .logo-b {
     animation: none;
     opacity: 0;
   }

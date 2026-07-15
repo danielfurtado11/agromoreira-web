@@ -11,3 +11,12 @@ export function formatPrice(value: string): string {
     currency: "EUR",
   }).format(Number(value));
 }
+
+/** Formats an ISO date string as "15 de julho de 2026". */
+export function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat("pt-PT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(iso));
+}

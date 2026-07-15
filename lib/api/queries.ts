@@ -3,6 +3,7 @@
 import { apiFetch } from "./client";
 import type {
   AboutUs,
+  Announcement,
   Category,
   Post,
   Product,
@@ -46,4 +47,9 @@ export function getStores(): Promise<Store[]> {
 /** The single "about us" record: description text, contacts and social links. */
 export function getAboutUs(): Promise<AboutUs> {
   return apiFetch<AboutUs>("/about-us");
+}
+
+/** Active site-wide announcements (e.g. holiday closures). */
+export function getAnnouncements(): Promise<Announcement[]> {
+  return apiFetch<Announcement[]>("/announcements");
 }

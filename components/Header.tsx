@@ -18,28 +18,28 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 py-3">
+      <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-6 py-3">
         {/* Logo: crossfades between the company's two brands. Both images are
             marked decorative (alt="") since the link itself is labelled. */}
         <Link
           href="/"
           aria-label="AgroMoreira's e AgroFontaínhas — início"
-          className="relative block h-12 w-36 shrink-0"
+          className="relative block h-16 w-48 shrink-0"
         >
           <Image
-            src="/logos/logo_1.jpg"
+            src="/logos/logo_1.png"
             alt=""
             fill
-            sizes="150px"
-            className="object-contain object-left"
+            sizes="200px"
+            className="logo-a object-contain object-left"
             priority
           />
           <Image
-            src="/logos/logo_2.jpg"
+            src="/logos/logo_2.png"
             alt=""
             fill
-            sizes="150px"
-            className="logo-crossfade-top object-contain object-left"
+            sizes="200px"
+            className="logo-b object-contain object-left"
             priority
           />
         </Link>
@@ -93,7 +93,7 @@ export function Header() {
       {/* Mobile navigation */}
       {menuOpen && (
         <nav className="border-t border-line bg-white md:hidden">
-          <ul className="mx-auto flex w-full max-w-[1440px] flex-col px-6 py-2">
+          <ul className="mx-auto flex w-full max-w-[1800px] flex-col px-6 py-2">
             {[...NAV, { href: "/contactos", label: "Contactos" }].map((item) => (
               <li key={item.href}>
                 <Link
