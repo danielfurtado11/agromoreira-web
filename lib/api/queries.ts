@@ -5,6 +5,7 @@ import type {
   AboutUs,
   Announcement,
   Category,
+  Employee,
   Post,
   Product,
   ProductDetail,
@@ -47,6 +48,11 @@ export function getPost(id: number): Promise<Post> {
 /** Physical stores, with address and opening hours. */
 export function getStores(): Promise<Store[]> {
   return apiFetch<Store[]>("/stores");
+}
+
+/** Staff members, each with their contact and the store they work at. */
+export function getEmployees(): Promise<Employee[]> {
+  return apiFetch<Employee[]>("/employees");
 }
 
 /** The single "about us" record: description text, contacts and social links. */

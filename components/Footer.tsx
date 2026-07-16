@@ -1,24 +1,5 @@
 import { getAboutUs, getStores } from "@/lib/api/queries";
-
-// Opening hours come from a JSON object, whose key order is not guaranteed.
-// This keeps the days in the natural Monday-to-Sunday order.
-const WEEKDAY_ORDER = [
-  "segunda",
-  "terça",
-  "quarta",
-  "quinta",
-  "sexta",
-  "sábado",
-  "domingo",
-];
-
-function sortByWeekday(entries: [string, unknown][]): [string, unknown][] {
-  const rank = (day: string) => {
-    const index = WEEKDAY_ORDER.indexOf(day.toLowerCase());
-    return index === -1 ? WEEKDAY_ORDER.length : index;
-  };
-  return [...entries].sort(([a], [b]) => rank(a) - rank(b));
-}
+import { sortByWeekday } from "@/lib/opening-hours";
 
 /**
  * Site footer. Fetches the stores (address + opening hours) and the "about us"

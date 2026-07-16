@@ -117,6 +117,20 @@ export default async function ProdutoPage({ params }: { params: Params }) {
               </ul>
             </div>
           )}
+
+          {/* There is no cart: ordering happens by phone/email, so point to
+              the contacts page from where the visitor decides to buy. */}
+          <p className="mt-8 text-sm text-ink-soft">
+            Para encomendar este produto,{" "}
+            <Link
+              href="/contactos"
+              className="group relative inline-block font-semibold text-primary"
+            >
+              contacte-nos
+              <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>

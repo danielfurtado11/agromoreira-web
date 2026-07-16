@@ -283,6 +283,30 @@ export interface paths {
         patch: operations["update_store_stores__store_id__patch"];
         trace?: never;
     };
+    "/stores/{store_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload Store Image
+         * @description Set the store photo, replacing any previous one. Admin only.
+         */
+        put: operations["upload_store_image_stores__store_id__image_put"];
+        post?: never;
+        /**
+         * Delete Store Image
+         * @description Remove the store photo. Admin only.
+         */
+        delete: operations["delete_store_image_stores__store_id__image_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/employees": {
         parameters: {
             query?: never;
@@ -642,6 +666,14 @@ export interface components {
              */
             is_cover: boolean;
         };
+        /** Body_upload_store_image_stores__store_id__image_put */
+        Body_upload_store_image_stores__store_id__image_put: {
+            /**
+             * File
+             * @description JPEG, PNG or WebP, up to 5 MB
+             */
+            file: string;
+        };
         /** CategoryCreate */
         CategoryCreate: {
             /** Name */
@@ -934,6 +966,8 @@ export interface components {
             opening_hours?: {
                 [key: string]: unknown;
             } | null;
+            /** Image Url */
+            readonly image_url: string | null;
         };
         /**
          * StoreSummary
@@ -1666,6 +1700,72 @@ export interface operations {
                 "application/json": components["schemas"]["StoreUpdate"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_store_image_stores__store_id__image_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_store_image_stores__store_id__image_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_store_image_stores__store_id__image_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                store_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
