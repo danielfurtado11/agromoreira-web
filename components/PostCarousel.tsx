@@ -238,7 +238,7 @@ function PostSlide({
       </div>
       <div className="w-full md:w-[45%]">
         <p className="text-xs font-semibold uppercase tracking-widest text-ink-soft">
-          {formatDate(post.created_at)} · Novidades
+          {formatDate(post.created_at)}
         </p>
         <h2 className="mt-2 text-2xl font-bold leading-tight md:text-3xl">
           <Link href={href} className="transition hover:text-primary" draggable={false}>

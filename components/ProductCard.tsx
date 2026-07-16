@@ -1,10 +1,13 @@
+import Link from "next/link";
 import type { Product } from "@/lib/api/types";
 import { formatPrice } from "@/lib/format";
 import { ProductImages } from "./ProductImages";
 
 /**
  * A single product in the catalogue grid: image(s), category, name and price
- * (with the discounted price and a "−%" tag when on sale).
+ * (with the discounted price and a "−%" tag when on sale). The whole card
+ * links to the product's detail page; the gallery arrows call preventDefault
+ * so paging through images does not follow this link.
  */
 export function ProductCard({ product }: { product: Product }) {
   // Cover image first, then the rest by their stored position.
@@ -20,7 +23,10 @@ export function ProductCard({ product }: { product: Product }) {
     : 0;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-lg">
+    <Link
+      href={`/produtos/${product.id}`}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-1 hover:shadow-lg"
+    >
       <div className="relative aspect-[4/3] bg-mist">
         <ProductImages images={images} name={product.name} />
 
@@ -50,6 +56,6 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
