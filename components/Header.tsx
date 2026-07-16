@@ -50,9 +50,12 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-ink-soft transition hover:text-primary"
+              className="group relative text-sm font-medium text-ink-soft transition hover:text-primary"
             >
               {item.label}
+              {/* Underline bar that grows on hover — same effect as the
+                  "see all" links. Contactos is excluded (it is a button). */}
+              <span className="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
           <Link

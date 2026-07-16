@@ -35,16 +35,16 @@ export function ProductCard({ product }: { product: Product }) {
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 bg-mist p-4">
-        <h3 className="text-lg font-semibold leading-tight">{product.name}</h3>
+      <div className="flex flex-1 flex-col gap-1.5 bg-mist p-3.5">
+        <h3 className="text-sm font-semibold leading-tight">{product.name}</h3>
 
-        <div className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-xl font-bold text-primary tabular-nums">
+        <div className="mt-auto flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+          <span className="text-lg font-bold text-primary tabular-nums">
             {formatPrice(onSale ? product.discount_price! : product.price)}
           </span>
-          <span className="text-sm text-ink-soft">/ {product.unit.name}</span>
+          <span className="text-xs text-ink-soft">/ {product.unit.name}</span>
           {onSale && (
-            <span className="text-sm text-ink-soft line-through tabular-nums">
+            <span className="text-xs text-ink-soft line-through tabular-nums">
               {formatPrice(product.price)}
             </span>
           )}

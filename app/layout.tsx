@@ -34,7 +34,9 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AnnouncementBar />
         <Header />
-        <div className="flex-1">{children}</div>
+        {/* Flex column so a page can grow to fill the height above the footer
+            (used e.g. by the catalogue's full-height left sidebar). */}
+        <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
       </body>
     </html>

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  useEffect,
   useRef,
   useState,
   type MouseEvent,
@@ -22,7 +21,7 @@ import { formatDate } from "@/lib/format";
 
 const DRAG_THRESHOLD = 60; // px needed to move to the next/previous slide
 const CLICK_JITTER_THRESHOLD = 15; // px of movement still treated as a click, not a drag
-const AUTOPLAY_MS = 8000; // auto-advance every 8s, unless paused
+const AUTOPLAY_MS = 5000; // auto-advance every 5s, unless paused
 
 /**
  * Rotating showcase of the latest posts. One post is shown at a time; arrows,
@@ -42,17 +41,10 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
   const count = posts.length;
 
   // Auto-advance is paused while the visitor is dragging, hovering over the
-  // carousel, or watching a video, so it never interrupts an interaction.
+  // carousel, or watching a video, so it never interrupts an interaction. The
+  // advance itself is driven by the active progress bar's animation (see the
+  // dots below): when the bar finishes filling, it moves to the next slide.
   const paused = isDragging || isHovering || playingId !== null;
-
-  useEffect(() => {
-    if (count < 2 || paused) return;
-    const timer = setTimeout(() => {
-      setPlayingId(null);
-      setIndex((i) => (i + 1) % count);
-    }, AUTOPLAY_MS);
-    return () => clearTimeout(timer);
-  }, [count, paused, index]);
 
   function goTo(next: number) {
     setPlayingId(null); // stop any playing video when the slide changes
@@ -150,18 +142,36 @@ export function PostCarousel({ posts }: { posts: Post[] }) {
 
       {count > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
-          {posts.map((post, i) => (
-            <button
-              key={post.id}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Ir para a publicação ${i + 1}`}
-              aria-current={i === index}
-              className={`h-2 rounded-full transition-all ${
-                i === index ? "w-6 bg-primary" : "w-2 bg-line hover:bg-ink-soft"
-              }`}
-            />
-          ))}
+          {posts.map((post, i) => {
+            const active = i === index;
+            return (
+              <button
+                key={post.id}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`Ir para a publicação ${i + 1}`}
+                aria-current={active}
+                className={`h-2 overflow-hidden rounded-full transition-all ${
+                  active ? "w-10 bg-primary/20" : "w-2 bg-line hover:bg-ink-soft"
+                }`}
+              >
+                {active && (
+                  // The fill animates from empty to full over AUTOPLAY_MS.
+                  // `key={index}` remounts it on every slide change so it
+                  // restarts; when it finishes, it advances the carousel.
+                  <span
+                    key={index}
+                    onAnimationEnd={() => goTo(index + 1)}
+                    style={{
+                      animationDuration: `${AUTOPLAY_MS}ms`,
+                      animationPlayState: paused ? "paused" : "running",
+                    }}
+                    className="carousel-progress block h-full w-full rounded-full bg-primary"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

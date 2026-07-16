@@ -20,6 +20,14 @@
   --font-sans: var(--font-geist-sans);
 }
 
+html {
+  /* Always reserve room for the vertical scrollbar, so short pages (no
+     scrollbar) and long pages (scrollbar) keep the same content width. This
+     stops the centered header — logo and nav — from shifting when navigating
+     between pages of different heights. */
+  scrollbar-gutter: stable;
+}
+
 body {
   background: #f4f7ee; /* soft green-tinted off-white, so cards stand out */
   color: var(--color-ink);
@@ -75,4 +83,27 @@ body {
     animation: none;
     opacity: 0;
   }
+}
+
+/*
+ * Carousel progress bar: the active dot fills up over the autoplay duration
+ * and, when full, the carousel advances (driven by its `animationend`). The
+ * duration and play/pause state are set inline on the element, so the fill
+ * freezes while the visitor hovers, drags, or watches a video.
+ */
+@keyframes carousel-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.carousel-progress {
+  transform-origin: left;
+  animation-name: carousel-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
 }

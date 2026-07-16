@@ -25,12 +25,12 @@ export function SectionHeading({
       {link && (
         <Link
           href={link.href}
-          className="group hidden shrink-0 items-center gap-1 text-sm font-semibold text-primary sm:inline-flex"
+          className="group relative hidden shrink-0 text-sm font-semibold text-primary sm:inline-block"
         >
           {link.label}
-          <span className="transition-transform group-hover:translate-x-1">
-            →
-          </span>
+          {/* Underline bar that grows from left to right on hover, hinting the
+              link is clickable (replaces the old arrow). */}
+          <span className="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-primary transition-all duration-300 group-hover:w-full" />
         </Link>
       )}
     </header>
