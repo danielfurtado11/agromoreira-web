@@ -63,17 +63,21 @@ export function youTubeThumbnail(id: string): string {
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
-/** Autoplaying embeddable player URL for a YouTube video id. */
-export function youTubeEmbedUrl(id: string): string {
-  return `https://www.youtube.com/embed/${id}?autoplay=1`;
+/**
+ * Embeddable player URL for a YouTube video id. `autoplay` starts playback on
+ * load (used when the visitor clicked play in the carousel); leave it off to
+ * show the player paused (e.g. on a post's detail page).
+ */
+export function youTubeEmbedUrl(id: string, autoplay = false): string {
+  return `https://www.youtube.com/embed/${id}${autoplay ? "?autoplay=1" : ""}`;
 }
 
-/** Autoplaying embeddable player URL for a public Facebook video post. */
-export function facebookVideoEmbedUrl(url: string): string {
+/** Embeddable player URL for a public Facebook video post. See `autoplay` above. */
+export function facebookVideoEmbedUrl(url: string, autoplay = false): string {
   const params = new URLSearchParams({
     href: url,
     show_text: "false",
-    autoplay: "true",
+    autoplay: autoplay ? "true" : "false",
   });
   return `https://www.facebook.com/plugins/video.php?${params.toString()}`;
 }

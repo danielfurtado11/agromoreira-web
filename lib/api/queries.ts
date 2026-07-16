@@ -39,6 +39,11 @@ export function getPosts(): Promise<Post[]> {
   return apiFetch<Post[]>("/posts");
 }
 
+/** A single news post. */
+export function getPost(id: number): Promise<Post> {
+  return apiFetch<Post>(`/posts/${id}`);
+}
+
 /** Physical stores, with address and opening hours. */
 export function getStores(): Promise<Store[]> {
   return apiFetch<Store[]>("/stores");

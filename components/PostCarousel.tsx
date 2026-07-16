@@ -274,7 +274,7 @@ function PostMedia({
       return (
         <div className={MEDIA_BOX}>
           <iframe
-            src={youTubeEmbedUrl(youTubeId)}
+            src={youTubeEmbedUrl(youTubeId, true)}
             title={post.title}
             allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
@@ -306,7 +306,7 @@ function PostMedia({
       return (
         <div className={MEDIA_BOX}>
           <iframe
-            src={facebookVideoEmbedUrl(post.embed_url)}
+            src={facebookVideoEmbedUrl(post.embed_url, true)}
             title={post.title}
             allow="autoplay; encrypted-media; picture-in-picture"
             allowFullScreen
