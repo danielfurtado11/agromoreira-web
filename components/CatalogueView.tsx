@@ -45,7 +45,7 @@ export function CatalogueView({
           onClick={() => setOpen(true)}
           aria-label="Mostrar categorias"
           aria-expanded={false}
-          className="sticky top-[89px] z-10 flex h-11 w-9 shrink-0 items-center justify-center self-start rounded-r-lg border border-l-0 border-line bg-white text-ink-soft shadow-md transition hover:text-primary"
+          className="sticky top-[var(--catalogue-offset)] z-10 flex h-11 w-9 shrink-0 items-center justify-center self-start rounded-r-lg border border-l-0 border-line bg-white text-ink-soft shadow-md transition hover:text-primary"
         >
           <MenuIcon />
         </button>

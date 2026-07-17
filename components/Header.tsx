@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { ADMIN_HOME } from "@/lib/auth";
 
 // Public navigation links. "Contactos" is handled separately because it is
 // styled as a button on desktop.
@@ -13,11 +14,23 @@ const NAV = [
   { href: "/sobre", label: "Sobre" },
 ];
 
-export function Header() {
+type HeaderProps = {
+  /** Whether the signed-in admin session cookie is present (checked server-side in layout.tsx, since it's httpOnly and unreadable here). */
+  isAdmin?: boolean;
+};
+
+export function Header({ isAdmin = false }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navItems = isAdmin
+    ? [...NAV, { href: ADMIN_HOME, label: "Administração" }]
+    : NAV;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
+    // `top-9` matches the admin bar's h-9, so the two stack flush with no gap
+    // or overlap while both are sticky.
+    <header
+      className={`sticky z-30 border-b border-line bg-white/85 backdrop-blur ${isAdmin ? "top-9" : "top-0"}`}
+    >
       <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-6 py-3">
         {/* Logo: crossfades between the company's two brands. Both images are
             marked decorative (alt="") since the link itself is labelled. */}
@@ -46,7 +59,7 @@ export function Header() {
 
         {/* Desktop navigation */}
         <nav className="hidden items-center gap-8 md:flex">
-          {NAV.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -97,7 +110,7 @@ export function Header() {
       {menuOpen && (
         <nav className="border-t border-line bg-white md:hidden">
           <ul className="mx-auto flex w-full max-w-[1800px] flex-col px-6 py-2">
-            {[...NAV, { href: "/contactos", label: "Contactos" }].map((item) => (
+            {[...navItems, { href: "/contactos", label: "Contactos" }].map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}

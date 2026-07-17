@@ -24,10 +24,11 @@ export function CategorySidebar({
 }) {
   return (
     <aside className="w-56 shrink-0 self-stretch border-r border-line bg-white md:w-64">
-      {/* `top`/`max-h` offset ≈ the sticky header's height (h-16 logo + py-3
-          + 1px border ≈ 89px), so the pinned list sits just below it and can
-          scroll internally down to the bottom of the viewport. */}
-      <div className="sticky top-[89px] max-h-[calc(100vh-89px)] overflow-y-auto px-4 py-8">
+      {/* `top`/`max-h` offset = `--catalogue-offset` (set in app/layout.tsx):
+          the sticky header's height, plus the admin bar's when signed in —
+          so the pinned list sits just below them and can scroll internally
+          down to the bottom of the viewport. */}
+      <div className="sticky top-[var(--catalogue-offset)] max-h-[calc(100vh-var(--catalogue-offset))] overflow-y-auto px-4 py-8">
         <div className="flex items-center justify-between gap-2 px-2">
           <h2 className="text-xs font-bold uppercase tracking-widest text-ink-soft">
             Categorias
