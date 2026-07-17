@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LOGIN_PATH, SESSION_COOKIE } from "@/lib/auth";
 import { ApiError, apiFetch } from "./client";
-import type { Post, Product } from "./types";
+import type { Announcement, Post, Product } from "./types";
 
 /** The signed-in admin's token, or null for a visitor. */
 export async function getSessionToken(): Promise<string | null> {
@@ -66,4 +66,12 @@ export function getAdminProducts(): Promise<Product[]> {
  */
 export function getAdminPosts(): Promise<Post[]> {
   return adminFetch<Post[]>("/posts?include_inactive=true&limit=50");
+}
+
+/**
+ * Every announcement, including the hidden ones — for the panel's list.
+ * `include_inactive` is token-guarded (403 otherwise), like posts/products.
+ */
+export function getAdminAnnouncements(): Promise<Announcement[]> {
+  return adminFetch<Announcement[]>("/announcements?include_inactive=true");
 }

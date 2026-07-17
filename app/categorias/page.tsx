@@ -4,6 +4,7 @@
 import type { Metadata } from "next";
 import { isAdmin } from "@/lib/api/admin";
 import { getCategories } from "@/lib/api/queries";
+import { VIRTUAL_CATEGORIES } from "@/lib/virtual-categories";
 import { AddCard } from "@/components/admin/AddCard";
 import { CategoryCard } from "@/components/CategoryCard";
 
@@ -24,11 +25,24 @@ export default async function CategoriasPage() {
       {/* Capped button size, as many columns as fit — same approach as the
           product grids, so cards never blow up on large screens. */}
       <div className="mt-8 grid grid-cols-2 gap-4 sm:[grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+        {/* Fixed collections first, tinted so they stand apart. */}
+        {VIRTUAL_CATEGORIES.map((virtual) => (
+          <CategoryCard
+            key={virtual.slug}
+            href={`/produtos?categoria=${virtual.slug}`}
+            label={virtual.name}
+            highlight
+          />
+        ))}
         {admin && (
           <AddCard href="/admin/categorias" label="Adicionar categoria" />
         )}
         {categories.map((category) => (
-          <CategoryCard key={category.id} category={category} />
+          <CategoryCard
+            key={category.id}
+            href={`/produtos?categoria=${category.id}`}
+            label={category.name}
+          />
         ))}
       </div>
     </div>

@@ -1,18 +1,16 @@
 import { getAnnouncements } from "@/lib/api/queries";
+import { AnnouncementRotator } from "./AnnouncementRotator";
 
 /**
- * Thin site-wide bar showing the most recent active announcement (for example a
- * holiday closure). Renders nothing when there are no active announcements.
+ * Thin site-wide bar showing the active announcements (for example holiday
+ * closures). Renders nothing when there are none; with several, they rotate.
+ * The data is fetched here on the server; AnnouncementRotator handles the
+ * cycling on the client.
  */
 export async function AnnouncementBar() {
   const announcements = await getAnnouncements();
-  const latest = announcements[0];
 
-  if (!latest) return null;
+  if (announcements.length === 0) return null;
 
-  return (
-    <div className="border-b border-accent/40 bg-accent-soft px-4 py-2 text-center text-sm text-accent-ink">
-      <span className="font-semibold">{latest.title}:</span> {latest.message}
-    </div>
-  );
+  return <AnnouncementRotator announcements={announcements} />;
 }

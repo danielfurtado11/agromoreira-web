@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Category } from "@/lib/api/types";
+import { VIRTUAL_CATEGORIES } from "@/lib/virtual-categories";
 
 /**
  * Left sidebar for the catalogue, flush against the viewport's left edge.
@@ -15,11 +16,12 @@ import type { Category } from "@/lib/api/types";
  */
 export function CategorySidebar({
   categories,
-  activeCategoryId,
+  activeCategory,
   onCollapse,
 }: {
   categories: Category[];
-  activeCategoryId?: number;
+  /** Raw `?categoria=` value: a numeric id, a virtual slug, or undefined. */
+  activeCategory?: string;
   onCollapse: () => void;
 }) {
   return (
@@ -47,14 +49,26 @@ export function CategorySidebar({
           <CategoryLink
             href="/produtos"
             label="Todos"
-            active={!activeCategoryId}
+            active={!activeCategory}
           />
+          {/* Fixed collections first, then the real categories after a rule. */}
+          {VIRTUAL_CATEGORIES.map((virtual) => (
+            <CategoryLink
+              key={virtual.slug}
+              href={`/produtos?categoria=${virtual.slug}`}
+              label={virtual.name}
+              active={activeCategory === virtual.slug}
+            />
+          ))}
+          {categories.length > 0 && (
+            <div className="my-1 border-t border-line" />
+          )}
           {categories.map((category) => (
             <CategoryLink
               key={category.id}
               href={`/produtos?categoria=${category.id}`}
               label={category.name}
-              active={category.id === activeCategoryId}
+              active={String(category.id) === activeCategory}
             />
           ))}
         </nav>

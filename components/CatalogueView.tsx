@@ -17,12 +17,13 @@ import { CategorySidebar } from "./CategorySidebar";
  */
 export function CatalogueView({
   categories,
-  activeCategoryId,
+  activeCategory,
   title,
   children,
 }: {
   categories: Category[];
-  activeCategoryId?: number;
+  /** Raw `?categoria=` value: a numeric id, a virtual slug, or undefined. */
+  activeCategory?: string;
   title: string;
   children: ReactNode;
 }) {
@@ -33,7 +34,7 @@ export function CatalogueView({
       {open ? (
         <CategorySidebar
           categories={categories}
-          activeCategoryId={activeCategoryId}
+          activeCategory={activeCategory}
           onCollapse={() => setOpen(false)}
         />
       ) : (

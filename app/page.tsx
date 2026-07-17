@@ -1,6 +1,7 @@
 // Homepage. Order: latest posts → featured & discounted products → categories.
 import Link from "next/link";
 import { getCategories, getPosts, getProducts } from "@/lib/api/queries";
+import { VIRTUAL_CATEGORIES } from "@/lib/virtual-categories";
 import { CategoryCard } from "@/components/CategoryCard";
 import { PostCarousel } from "@/components/PostCarousel";
 import { ProductCard } from "@/components/ProductCard";
@@ -67,8 +68,20 @@ export default async function Home() {
           link={{ href: "/categorias", label: "Ver tudo" }}
         />
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {VIRTUAL_CATEGORIES.map((virtual) => (
+            <CategoryCard
+              key={virtual.slug}
+              href={`/produtos?categoria=${virtual.slug}`}
+              label={virtual.name}
+              highlight
+            />
+          ))}
           {categories.map((category) => (
-            <CategoryCard key={category.id} category={category} />
+            <CategoryCard
+              key={category.id}
+              href={`/produtos?categoria=${category.id}`}
+              label={category.name}
+            />
           ))}
         </div>
       </section>
