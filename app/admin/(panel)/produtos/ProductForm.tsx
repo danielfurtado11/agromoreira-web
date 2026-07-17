@@ -42,6 +42,7 @@ export function ProductForm({
   units,
   stores,
   product,
+  initialCategoryId,
   action,
   submitLabel,
   notice,
@@ -54,6 +55,8 @@ export function ProductForm({
   stores: Store[];
   /** Undefined when creating. */
   product?: ProductDetail;
+  /** Pre-selected category when creating (from the category being browsed). */
+  initialCategoryId?: number;
   action: (formData: FormData) => Promise<ProductActionResult>;
   submitLabel: string;
   /** Message carried over from a previous step (e.g. a failed upload). */
@@ -172,7 +175,7 @@ export function ProductForm({
             id="category_id"
             name="category_id"
             required
-            defaultValue={product?.category.id ?? ""}
+            defaultValue={product?.category.id ?? initialCategoryId ?? ""}
             className={INPUT}
           >
             <option value="" disabled>

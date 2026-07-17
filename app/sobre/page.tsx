@@ -9,6 +9,7 @@ import { getAboutUs, getEmployees, getStores } from "@/lib/api/queries";
 import type { Employee, Store } from "@/lib/api/types";
 import { sortByWeekday } from "@/lib/opening-hours";
 import { ContactPill } from "@/components/ContactPill";
+import { FormattedText } from "@/components/FormattedText";
 import { SectionHeading } from "@/components/SectionHeading";
 import { VideoEmbed } from "@/components/VideoEmbed";
 
@@ -57,9 +58,10 @@ export default async function SobrePage() {
       </div>
 
       {/* The story, spanning the page's full width. */}
-      <div className="mt-10 whitespace-pre-line text-center text-lg leading-relaxed text-ink-soft">
-        {about.text}
-      </div>
+      <FormattedText
+        text={about.text}
+        className="mt-10 whitespace-pre-line text-center text-lg leading-relaxed text-ink-soft"
+      />
 
       {about.video_url && (
         <div className="mx-auto mt-10 max-w-[820px]">

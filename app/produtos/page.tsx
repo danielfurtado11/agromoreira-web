@@ -6,6 +6,7 @@
 import type { Metadata } from "next";
 import { isAdmin } from "@/lib/api/admin";
 import { getCategories, getProducts } from "@/lib/api/queries";
+import { AddCard } from "@/components/admin/AddCard";
 import { CatalogueView } from "@/components/CatalogueView";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -46,19 +47,26 @@ export default async function ProdutosPage({
 
   const activeCategory = categories.find((c) => c.id === categoryId);
 
+  // The "+" card carries the category being browsed, so the admin create form
+  // opens with it already chosen.
+  const createHref = categoryId
+    ? `/admin/produtos?novo=1&categoria=${categoryId}`
+    : "/admin/produtos?novo=1";
+
   return (
     <CatalogueView
       categories={categories}
       activeCategoryId={categoryId}
       title={activeCategory ? activeCategory.name : "Todos os produtos"}
     >
-      {products.length > 0 ? (
+      {products.length > 0 || admin ? (
         // Cards have a target width (~200px) and the grid fits as many columns
         // as the product area allows — so a wide screen gets MORE columns
         // rather than bigger cards, capping each card's size. `auto-fill` (not
         // `auto-fit`) keeps cards small even when a category has few products.
         // Below @md the container is narrow, so a plain 2-column grid is used.
         <div className="grid grid-cols-2 gap-5 @md:[grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
+          {admin && <AddCard href={createHref} label="Adicionar produto" />}
           {products.map((product) => (
             <ProductCard
               key={product.id}

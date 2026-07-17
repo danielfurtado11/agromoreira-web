@@ -4,16 +4,27 @@ import { getCategories, getStores, getUnits } from "@/lib/api/queries";
 import type { ProductDetail } from "@/lib/api/types";
 import { ProductsManager } from "./ProductsManager";
 
-/** `?editar=<id>` deep-links straight into that product's edit window. */
-type SearchParams = Promise<{ editar?: string }>;
+/**
+ * `?editar=<id>` deep-links into that product's edit window. `?novo` (from the
+ * public site's "+" card) opens the create window, with `?categoria=<id>`
+ * pre-selecting the category being browsed.
+ */
+type SearchParams = Promise<{
+  editar?: string;
+  novo?: string;
+  categoria?: string;
+}>;
 
 export default async function AdminProductsPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { editar } = await searchParams;
+  const { editar, novo, categoria } = await searchParams;
   const editId = Number(editar);
+  const categoryId = Number(categoria);
+  const initialCategoryId =
+    Number.isInteger(categoryId) && categoryId > 0 ? categoryId : undefined;
 
   // Loading the deep-linked product here, on the server, means the edit
   // window opens already filled — no client-side effect or extra round-trip.
@@ -50,6 +61,8 @@ export default async function AdminProductsPage({
         stores={stores}
         initialProduct={initialProduct}
         initialError={initialError}
+        initialCreate={novo != null}
+        initialCategoryId={initialCategoryId}
       />
     </div>
   );

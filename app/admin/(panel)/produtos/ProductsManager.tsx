@@ -34,6 +34,8 @@ export function ProductsManager({
   stores,
   initialProduct,
   initialError,
+  initialCreate = false,
+  initialCategoryId,
 }: {
   products: Product[];
   categories: Category[];
@@ -43,13 +45,26 @@ export function ProductsManager({
   initialProduct?: ProductDetail;
   /** Shown when the `?editar=<id>` product could not be loaded. */
   initialError?: string;
+  /** Open the create window on arrival (from the public site's "+" card). */
+  initialCreate?: boolean;
+  /** Category to pre-select in that create window (the one being browsed). */
+  initialCategoryId?: number;
 }) {
   const router = useRouter();
   const [modal, setModal] = useState<ModalState>(
     initialProduct
       ? { mode: "edit", product: initialProduct }
-      : { mode: "closed" },
+      : initialCreate
+        ? { mode: "create" }
+        : { mode: "closed" },
   );
+
+  // Only pre-select a category that actually exists, so a stale link falls
+  // back to "Escolher..." rather than an empty selection.
+  const createCategoryId =
+    initialCategoryId && categories.some((c) => c.id === initialCategoryId)
+      ? initialCategoryId
+      : undefined;
   const [loadingId, setLoadingId] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(
     initialError ?? null,
@@ -89,7 +104,8 @@ export function ProductsManager({
   // The `?editar` deep link has done its job once the page arrives (the modal
   // state above already reflects it), so strip the param — otherwise a refresh
   // would reopen a window the admin had closed.
-  const deepLinked = initialProduct !== undefined || initialError !== undefined;
+  const deepLinked =
+    initialProduct !== undefined || initialError !== undefined || initialCreate;
   useEffect(() => {
     if (deepLinked) router.replace("/admin/produtos", { scroll: false });
     // Runs once on mount: the deep link only matters on arrival.
@@ -220,6 +236,7 @@ export function ProductsManager({
             categories={categories}
             units={units}
             stores={stores}
+            initialCategoryId={createCategoryId}
             action={createProduct}
             submitLabel="Criar produto"
             onCancel={() => setModal({ mode: "closed" })}

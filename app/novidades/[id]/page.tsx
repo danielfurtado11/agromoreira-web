@@ -6,13 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiError } from "@/lib/api/client";
 import { getPost } from "@/lib/api/queries";
-import type { Post } from "@/lib/api/types";
-import {
-  facebookVideoEmbedUrl,
-  getEmbedProvider,
-  getYouTubeId,
-  youTubeEmbedUrl,
-} from "@/lib/embeds";
+import { PostDetailMedia } from "@/components/PostDetailMedia";
 import { formatDate } from "@/lib/format";
 
 type Params = Promise<{ id: string }>;
@@ -59,7 +53,7 @@ export default async function NovidadePage({ params }: { params: Params }) {
       </p>
       <h1 className="mt-2 text-4xl font-bold leading-tight">{post.title}</h1>
 
-      <PostMedia post={post} />
+      <PostDetailMedia post={post} />
 
       {post.text && (
         <div className="mt-6 whitespace-pre-line leading-relaxed text-ink-soft">
@@ -68,82 +62,4 @@ export default async function NovidadePage({ params }: { params: Params }) {
       )}
     </article>
   );
-}
-
-/** The post's media: embedded video, image, Instagram link, or nothing. */
-function PostMedia({ post }: { post: Post }) {
-  const provider = post.embed_url ? getEmbedProvider(post.embed_url) : null;
-
-  if (provider === "youtube") {
-    const videoId = getYouTubeId(post.embed_url!);
-    if (videoId) {
-      return (
-        <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl bg-mist">
-          <iframe
-            src={youTubeEmbedUrl(videoId)}
-            title={post.title}
-            allow="encrypted-media; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 h-full w-full"
-          />
-        </div>
-      );
-    }
-  }
-
-  if (provider === "facebook") {
-    return (
-      <div className="relative mt-6 aspect-video overflow-hidden rounded-2xl bg-mist">
-        <iframe
-          src={facebookVideoEmbedUrl(post.embed_url!)}
-          title={post.title}
-          allow="encrypted-media; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full"
-        />
-      </div>
-    );
-  }
-
-  // Instagram cannot be embedded without an API key, so link out to the post.
-  if (provider === "instagram") {
-    return (
-      <a
-        href={post.embed_url!}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-6 flex items-center justify-center gap-2 rounded-2xl border border-line bg-mist px-6 py-10 text-sm font-semibold text-primary transition hover:border-primary"
-      >
-        Ver publicação no Instagram
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M14 4h6v6" />
-          <path d="M20 4L11 13" />
-          <path d="M19 14v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
-        </svg>
-      </a>
-    );
-  }
-
-  if (post.image_url) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={post.image_url}
-        alt={post.title}
-        className="mt-6 w-full rounded-2xl bg-mist"
-      />
-    );
-  }
-
-  return null;
 }

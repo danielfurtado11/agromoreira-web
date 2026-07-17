@@ -223,6 +223,31 @@ function PostSlide({
   const youTubeId =
     provider === "youtube" ? getYouTubeId(post.embed_url!) : null;
   const href = `/novidades/${post.id}`;
+  const hasMedia = Boolean(post.image_url) || provider !== null;
+
+  // A text-only post has no media box to sit beside, so the side-by-side layout
+  // would leave an empty placeholder. Instead the title and text take the whole
+  // width, centred — filling the slide's height (set by the media posts) so it
+  // reads as a deliberate quote-style card, not a half-empty one.
+  if (!hasMedia) {
+    return (
+      <article className="flex min-h-[18rem] w-full shrink-0 flex-col items-center justify-center gap-3 px-6 text-center md:min-h-[22rem]">
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink-soft">
+          {formatDate(post.created_at)}
+        </p>
+        <h2 className="text-2xl font-bold leading-tight md:text-4xl">
+          <Link href={href} className="transition hover:text-primary" draggable={false}>
+            {post.title}
+          </Link>
+        </h2>
+        {post.text && (
+          <p className="max-w-2xl text-lg leading-relaxed text-ink-soft">
+            {post.text}
+          </p>
+        )}
+      </article>
+    );
+  }
 
   return (
     <article className="flex w-full shrink-0 flex-col items-center gap-6 md:flex-row md:gap-10">
@@ -303,8 +328,14 @@ function PostMedia({
   // as the poster instead — a badge marks it as a Facebook video either way.
   if (provider === "facebook" && post.embed_url) {
     if (playing) {
+      // Facebook's video plugin renders the clip at its own 16:9 ratio and
+      // does not stretch to fill the box (unlike YouTube's player). In the
+      // 16:10 poster box that left a strip of the green `bg-mist` showing
+      // below it, so while playing the box switches to 16:9 with a black
+      // backdrop — the player fills it and any residual letterbox reads as a
+      // normal video, not a green band.
       return (
-        <div className={MEDIA_BOX}>
+        <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
           <iframe
             src={facebookVideoEmbedUrl(post.embed_url, true)}
             title={post.title}

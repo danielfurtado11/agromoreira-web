@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LOGIN_PATH, SESSION_COOKIE } from "@/lib/auth";
 import { ApiError, apiFetch } from "./client";
-import type { Product } from "./types";
+import type { Post, Product } from "./types";
 
 /** The signed-in admin's token, or null for a visitor. */
 export async function getSessionToken(): Promise<string | null> {
@@ -57,4 +57,13 @@ export async function adminFetch<T>(
  */
 export function getAdminProducts(): Promise<Product[]> {
   return adminFetch<Product[]>("/products?include_inactive=true");
+}
+
+/**
+ * Every post, including the hidden ones — for the panel's list. `include_
+ * inactive` is token-guarded (403 otherwise), like products. A generous limit
+ * avoids needing pagination in the panel for this small a feed.
+ */
+export function getAdminPosts(): Promise<Post[]> {
+  return adminFetch<Post[]>("/posts?include_inactive=true&limit=50");
 }

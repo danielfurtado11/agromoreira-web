@@ -1,43 +1,31 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { Store } from "@/lib/api/types";
-import { WEEKDAY_ORDER } from "@/lib/opening-hours";
+import type { Employee, Store } from "@/lib/api/types";
 import {
   PendingPhotoField,
   SavedPhotoField,
 } from "@/components/admin/SinglePhotoField";
 import {
-  deleteStoreImage,
-  uploadStoreImage,
-  type StoreActionResult,
+  deleteEmployeeImage,
+  uploadEmployeeImage,
+  type EmployeeActionResult,
 } from "./actions";
 
 const INPUT =
   "mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink outline-none transition focus:border-primary";
 const LABEL = "block text-sm font-medium";
 
-/** Reads one day's hours out of the free-form opening_hours object. */
-function hoursFor(store: Store | undefined, day: string): string {
-  const value = store?.opening_hours?.[day];
-  return typeof value === "string" ? value : "";
-}
-
 /**
- * The store form, shared by the create and edit windows.
+ * The employee form, shared by the create and edit windows.
  *
- * Opening hours are edited as one text field per weekday — matching how the
- * API stores them (a day → text object) without asking the admin to write
- * JSON. An empty field omits the day from the site.
- *
- * The photo works like a product's: the upload endpoint needs a store id, so
- * when creating we hold the chosen file in memory and send it right after the
- * store is saved — the admin fills one form, presses once, and never sees the
- * two requests. When editing, the store already exists, so uploads take effect
- * immediately.
+ * Like the store form, the photo works the product way: while creating we hold
+ * the chosen file in memory and upload it right after the employee is saved
+ * (the upload endpoint needs an id); while editing, uploads take effect at once.
  */
-export function StoreForm({
-  store,
+export function EmployeeForm({
+  employee,
+  stores,
   action,
   submitLabel,
   notice,
@@ -45,14 +33,15 @@ export function StoreForm({
   onSaved,
 }: {
   /** Undefined when creating. */
-  store?: Store;
-  action: (formData: FormData) => Promise<StoreActionResult>;
+  employee?: Employee;
+  stores: Store[];
+  action: (formData: FormData) => Promise<EmployeeActionResult>;
   submitLabel: string;
   /** Message carried over from a previous step (e.g. a failed photo upload). */
   notice?: string;
   onCancel: () => void;
-  /** `photoFailed` is true when the store saved but its photo did not upload. */
-  onSaved: (store: Store, photoFailed: boolean) => void;
+  /** `photoFailed` is true when the employee saved but the photo did not. */
+  onSaved: (employee: Employee, photoFailed: boolean) => void;
 }) {
   const [pendingPhoto, setPendingPhoto] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -70,19 +59,19 @@ export function StoreForm({
       }
       setError(null);
 
-      const saved = result.store;
+      const saved = result.employee;
       if (!saved) return;
 
-      // Creating with a photo: the store exists now, so send the file that was
-      // held in memory. A failed photo is recoverable (the window reopens on
-      // the saved store to retry), which beats losing the whole form.
+      // Creating with a photo: the employee exists now, so send the file held
+      // in memory. A failed photo is recoverable (the window reopens to retry),
+      // which beats losing the whole form.
       let photoFailed = false;
       if (pendingPhoto) {
         setUploading(true);
         const photoData = new FormData();
-        photoData.set("store_id", String(saved.id));
+        photoData.set("employee_id", String(saved.id));
         photoData.set("file", pendingPhoto);
-        const uploadResult = await uploadStoreImage(photoData);
+        const uploadResult = await uploadEmployeeImage(photoData);
         setUploading(false);
         photoFailed = Boolean(uploadResult.error);
       }
@@ -93,7 +82,7 @@ export function StoreForm({
 
   return (
     <form action={submit} className="space-y-5">
-      {store && <input type="hidden" name="id" value={store.id} />}
+      {employee && <input type="hidden" name="id" value={employee.id} />}
 
       <div>
         <label htmlFor="name" className={LABEL}>
@@ -104,67 +93,79 @@ export function StoreForm({
           name="name"
           required
           maxLength={100}
-          defaultValue={store?.name ?? ""}
+          defaultValue={employee?.name ?? ""}
           className={INPUT}
         />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="contact" className={LABEL}>
+            Contacto
+          </label>
+          <input
+            id="contact"
+            name="contact"
+            required
+            maxLength={100}
+            placeholder="ex.: 912 345 678"
+            defaultValue={employee?.contact ?? ""}
+            className={INPUT}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="store_id" className={LABEL}>
+            Loja
+          </label>
+          <select
+            id="store_id"
+            name="store_id"
+            required
+            defaultValue={employee?.store.id ?? ""}
+            className={INPUT}
+          >
+            <option value="" disabled>
+              Escolher...
+            </option>
+            {stores.map((store) => (
+              <option key={store.id} value={store.id}>
+                {store.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="address" className={LABEL}>
-          Morada
+        <label htmlFor="description" className={LABEL}>
+          Descrição (opcional)
         </label>
-        <input
-          id="address"
-          name="address"
-          required
-          maxLength={200}
-          defaultValue={store?.address ?? ""}
+        <textarea
+          id="description"
+          name="description"
+          rows={3}
+          placeholder="Função, área de que trata, ..."
+          defaultValue={employee?.description ?? ""}
           className={INPUT}
         />
       </div>
 
-      <fieldset>
-        <legend className={LABEL}>Horário</legend>
-        <p className="mt-1 text-xs text-ink-soft">
-          Deixe um dia vazio para não o mostrar no site. Escreva
-          &quot;Fechado&quot; para indicar que a loja não abre nesse dia.
-        </p>
-        <div className="mt-3 space-y-2">
-          {WEEKDAY_ORDER.map((day) => (
-            <div key={day} className="flex items-center gap-3">
-              <label
-                htmlFor={`hours_${day}`}
-                className="w-24 text-sm capitalize text-ink-soft"
-              >
-                {day}
-              </label>
-              <input
-                id={`hours_${day}`}
-                name={`hours_${day}`}
-                placeholder="ex.: 9h-13h, 14h-19h"
-                defaultValue={hoursFor(store, day)}
-                className={`${INPUT} mt-0 flex-1`}
-              />
-            </div>
-          ))}
-        </div>
-      </fieldset>
-
       <div className="border-t border-line pt-5">
-        {store ? (
+        {employee ? (
           <SavedPhotoField
-            entityId={store.id}
-            entityName={store.name}
-            imageUrl={store.image_url}
-            idField="store_id"
-            uploadAction={uploadStoreImage}
-            deleteAction={deleteStoreImage}
+            entityId={employee.id}
+            entityName={employee.name}
+            imageUrl={employee.image_url}
+            idField="employee_id"
+            uploadAction={uploadEmployeeImage}
+            deleteAction={deleteEmployeeImage}
           />
         ) : (
           <PendingPhotoField
             file={pendingPhoto}
             onChange={setPendingPhoto}
-            hint="É enviada ao criar a loja."
+            hint="É enviada ao criar o funcionário."
           />
         )}
       </div>

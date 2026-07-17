@@ -14,6 +14,28 @@ export function PostCard({ post }: { post: Post }) {
     provider === "youtube" ? getYouTubeId(post.embed_url!) : null;
   const thumbnail = youTubeId ? youTubeThumbnail(youTubeId) : post.image_url;
   const isVideo = provider === "youtube" || provider === "facebook";
+  const hasMedia = Boolean(thumbnail) || provider !== null;
+
+  // A text-only post has no thumbnail to head the card, so instead of a leaf
+  // placeholder the whole card becomes a centred, tinted text card — it reads
+  // as intentional and lets the excerpt run longer. Grid `align-items: stretch`
+  // keeps it the same height as the media cards beside it.
+  if (!hasMedia) {
+    return (
+      <Link
+        href={`/novidades/${post.id}`}
+        className="group flex min-h-[16rem] flex-col items-center justify-center gap-2 rounded-2xl border border-line bg-mist p-6 text-center transition hover:-translate-y-1 hover:shadow-lg"
+      >
+        <p className="text-xs font-semibold uppercase tracking-widest text-ink-soft">
+          {formatDate(post.created_at)}
+        </p>
+        <h3 className="text-lg font-bold leading-tight">{post.title}</h3>
+        {post.text && (
+          <p className="line-clamp-4 text-sm text-ink-soft">{post.text}</p>
+        )}
+      </Link>
+    );
+  }
 
   return (
     <Link
