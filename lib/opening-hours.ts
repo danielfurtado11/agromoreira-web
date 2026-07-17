@@ -2,7 +2,8 @@
 // guaranteed. These helpers keep the days in the natural Monday-to-Sunday
 // order wherever hours are listed (footer, about page, ...).
 
-const WEEKDAY_ORDER = [
+/** Weekday keys in display order — also the fields of the admin hours form. */
+export const WEEKDAY_ORDER = [
   "segunda",
   "terça",
   "quarta",
@@ -10,14 +11,18 @@ const WEEKDAY_ORDER = [
   "sexta",
   "sábado",
   "domingo",
-];
+] as const;
 
 /** Sorts `Object.entries(opening_hours)` into Monday-to-Sunday order. */
 export function sortByWeekday(
   entries: [string, unknown][],
 ): [string, unknown][] {
   const rank = (day: string) => {
-    const index = WEEKDAY_ORDER.indexOf(day.toLowerCase());
+    // Widened to string[]: indexOf on the `as const` tuple would only accept
+    // the seven exact literals, but `day` is whatever the API sent.
+    const index = (WEEKDAY_ORDER as readonly string[]).indexOf(
+      day.toLowerCase(),
+    );
     return index === -1 ? WEEKDAY_ORDER.length : index;
   };
   return [...entries].sort(([a], [b]) => rank(a) - rank(b));
