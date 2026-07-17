@@ -1,16 +1,28 @@
-import { getAboutUs, getStores } from "@/lib/api/queries";
+import { getAboutUs, getEmployees, getStores } from "@/lib/api/queries";
 import { sortByWeekday } from "@/lib/opening-hours";
 
 /**
- * Site footer. Fetches the stores (address + opening hours) and the "about us"
- * record (contacts) on the server, so every page shows up-to-date store info.
+ * Site footer. Fetches the stores (address + opening hours), the staff
+ * (name + phone) and the "about us" record (digital contacts) on the server,
+ * so every page shows up-to-date information.
  */
 export async function Footer() {
-  const [stores, about] = await Promise.all([getStores(), getAboutUs()]);
+  const [stores, employees, about] = await Promise.all([
+    getStores(),
+    getEmployees(),
+    getAboutUs(),
+  ]);
+
+  const hasDigital = Boolean(
+    about.email || about.facebook_url || about.instagram_url,
+  );
 
   return (
     <footer className="bg-primary text-white/80">
-      <div className="mx-auto grid w-full max-w-[1800px] gap-8 px-6 py-12 md:grid-cols-4">
+      {/* Auto-fit columns, so the brand, each store, staff and digital blocks
+          lay out evenly whatever the store/staff count, wrapping on narrow
+          screens instead of overflowing a fixed column count. */}
+      <div className="mx-auto grid w-full max-w-[1800px] gap-8 px-6 py-12 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
         <div>
           <p className="text-lg font-bold text-white">
             AgroMoreira&apos;s · AgroFontaínhas
@@ -42,47 +54,70 @@ export async function Footer() {
           </div>
         ))}
 
-        <div>
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-white/60">
-            Contactos
-          </h3>
-          <ul className="mt-2 space-y-1 text-sm text-white/80">
-            {about.email && (
-              <li>
-                <a
-                  href={`mailto:${about.email}`}
-                  className="transition hover:text-white"
-                >
-                  {about.email}
-                </a>
-              </li>
-            )}
-            {about.facebook_url && (
-              <li>
-                <a
-                  href={about.facebook_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition hover:text-white"
-                >
-                  Facebook
-                </a>
-              </li>
-            )}
-            {about.instagram_url && (
-              <li>
-                <a
-                  href={about.instagram_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition hover:text-white"
-                >
-                  Instagram
-                </a>
-              </li>
-            )}
-          </ul>
-        </div>
+        {employees.length > 0 && (
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-white/60">
+              Contactos
+            </h3>
+            <ul className="mt-2 space-y-1 text-sm text-white/80">
+              {employees.map((employee) => (
+                <li key={employee.id}>
+                  {employee.name} ·{" "}
+                  <a
+                    href={`tel:${employee.contact.replace(/\s/g, "")}`}
+                    className="transition hover:text-white"
+                  >
+                    {employee.contact}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {hasDigital && (
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-white/60">
+              Digital
+            </h3>
+            <ul className="mt-2 space-y-1 text-sm text-white/80">
+              {about.email && (
+                <li>
+                  <a
+                    href={`mailto:${about.email}`}
+                    className="transition hover:text-white"
+                  >
+                    {about.email}
+                  </a>
+                </li>
+              )}
+              {about.facebook_url && (
+                <li>
+                  <a
+                    href={about.facebook_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition hover:text-white"
+                  >
+                    Facebook
+                  </a>
+                </li>
+              )}
+              {about.instagram_url && (
+                <li>
+                  <a
+                    href={about.instagram_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="transition hover:text-white"
+                  >
+                    Instagram
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
 
       <div className="border-t border-white/15">

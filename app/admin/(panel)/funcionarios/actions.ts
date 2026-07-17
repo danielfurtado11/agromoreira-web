@@ -12,10 +12,13 @@ import type { ActionResult } from "@/lib/admin";
  */
 export type EmployeeActionResult = ActionResult & { employee?: Employee };
 
-/** Employees are listed on the public contacts page and in the admin panel. */
+/**
+ * Employees appear in the footer (name + phone) on every page, plus the
+ * contacts and about pages — so a change must revalidate the whole tree, not a
+ * fixed list of paths that would leave the footer stale elsewhere.
+ */
 function revalidateEmployees() {
-  revalidatePath("/contactos");
-  revalidatePath("/admin/funcionarios");
+  revalidatePath("/", "layout");
 }
 
 function messageFor(error: unknown, fallback: string): string {
