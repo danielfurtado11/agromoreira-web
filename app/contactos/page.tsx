@@ -29,7 +29,7 @@ export default async function ContactosPage() {
   ]);
 
   const hasContacts = Boolean(
-    about.email || about.facebook_url || about.instagram_url,
+    about && (about.email || about.facebook_url || about.instagram_url),
   );
 
   return (
@@ -39,7 +39,7 @@ export default async function ContactosPage() {
         Fale connosco ou visite-nos numa das nossas lojas.
       </p>
 
-      {hasContacts && (
+      {about && hasContacts && (
         <div className="mt-6 flex flex-wrap gap-3">
           {about.email && (
             <ContactPill href={`mailto:${about.email}`}>

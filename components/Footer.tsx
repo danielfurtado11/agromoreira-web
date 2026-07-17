@@ -14,7 +14,7 @@ export async function Footer() {
   ]);
 
   const hasDigital = Boolean(
-    about.email || about.facebook_url || about.instagram_url,
+    about && (about.email || about.facebook_url || about.instagram_url),
   );
 
   return (
@@ -75,7 +75,7 @@ export async function Footer() {
           </div>
         )}
 
-        {hasDigital && (
+        {about && hasDigital && (
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-white/60">
               Digital

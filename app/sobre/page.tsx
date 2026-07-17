@@ -25,7 +25,7 @@ export default async function SobrePage() {
   ]);
 
   const hasContacts = Boolean(
-    about.email || about.facebook_url || about.instagram_url,
+    about && (about.email || about.facebook_url || about.instagram_url),
   );
 
   return (
@@ -57,13 +57,16 @@ export default async function SobrePage() {
         </div>
       </div>
 
-      {/* The story, spanning the page's full width. */}
-      <FormattedText
-        text={about.text}
-        className="mt-10 whitespace-pre-line text-center text-lg leading-relaxed text-ink-soft"
-      />
+      {/* The story, spanning the page's full width. Absent until the admin
+          fills in the "about us" record (the API returns 404 until then). */}
+      {about?.text && (
+        <FormattedText
+          text={about.text}
+          className="mt-10 whitespace-pre-line text-center text-lg leading-relaxed text-ink-soft"
+        />
+      )}
 
-      {about.video_url && (
+      {about?.video_url && (
         <div className="mx-auto mt-10 max-w-[820px]">
           <VideoEmbed
             url={about.video_url}
@@ -96,7 +99,7 @@ export default async function SobrePage() {
         </section>
       )}
 
-      {hasContacts && (
+      {about && hasContacts && (
         <section className="mt-16 border-t border-line pt-12">
           <SectionHeading eyebrow="Contactos" title="Fale connosco" />
           <div className="flex flex-wrap gap-3">

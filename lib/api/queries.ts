@@ -1,6 +1,6 @@
 // Per-resource functions: each one knows its endpoint path and return type.
 // Pages call these instead of using `fetch` directly.
-import { apiFetch } from "./client";
+import { ApiError, apiFetch } from "./client";
 import type {
   AboutUs,
   Announcement,
@@ -65,9 +65,19 @@ export function getEmployees(): Promise<Employee[]> {
   return apiFetch<Employee[]>("/employees");
 }
 
-/** The single "about us" record: description text, contacts and social links. */
-export function getAboutUs(): Promise<AboutUs> {
-  return apiFetch<AboutUs>("/about-us");
+/**
+ * The single "about us" record: description text, contacts and social links.
+ * Returns null when it hasn't been filled in yet — the API replies 404 in that
+ * case (a fresh production database), and the site must still render rather
+ * than crash. Callers treat null as "no content yet".
+ */
+export async function getAboutUs(): Promise<AboutUs | null> {
+  try {
+    return await apiFetch<AboutUs>("/about-us");
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
 }
 
 /** Active site-wide announcements (e.g. holiday closures). */
