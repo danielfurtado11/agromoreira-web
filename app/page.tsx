@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { getCategories, getPosts, getProducts } from "@/lib/api/queries";
 import { VIRTUAL_CATEGORIES } from "@/lib/virtual-categories";
+import { BrandMarquee } from "@/components/BrandMarquee";
 import { CategoryCard } from "@/components/CategoryCard";
 import { PostCarousel } from "@/components/PostCarousel";
 import { ProductCard } from "@/components/ProductCard";
@@ -85,6 +86,10 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Partner brands, scrolling continuously. Renders nothing until logos
+          are added to public/brands/. Sits last, just before the footer. */}
+      <BrandMarquee />
     </div>
   );
 }

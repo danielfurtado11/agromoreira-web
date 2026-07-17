@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The homepage brand marquee lists public/brands/ at runtime with `fs`. On
+  // some hosts (e.g. Vercel) files under public/ aren't on the server's
+  // filesystem unless traced into the build — this bundles them so the marquee
+  // finds the logos in production too. Harmless on Node hosts (Cloud Run).
+  outputFileTracingIncludes: {
+    "/": ["./public/brands/**/*"],
+  },
   experimental: {
     serverActions: {
       // Image uploads travel through Server Actions on their way to the API,

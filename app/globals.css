@@ -130,3 +130,58 @@ body {
     animation: none;
   }
 }
+
+/*
+ * Brand marquee (homepage): a continuous strip of partner-brand logos. The
+ * track holds the logo list twice and slides exactly one copy's width; going
+ * from -50% to 0 makes it travel left → right, and the reset is invisible
+ * because the two halves are identical. Pauses while hovered.
+ */
+@keyframes brand-marquee {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.brand-marquee-track {
+  width: max-content;
+  animation: brand-marquee 40s linear infinite;
+}
+
+.brand-marquee:hover .brand-marquee-track {
+  animation-play-state: paused;
+}
+
+.brand-marquee {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No motion: lay the logos out static, centered and wrapped, and drop the
+     decorative second half so nothing is duplicated on screen. */
+  .brand-marquee-track {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: none;
+  }
+  .brand-marquee-track > [aria-hidden="true"] {
+    display: none;
+  }
+}
