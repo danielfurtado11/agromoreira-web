@@ -10,7 +10,7 @@ import { ADMIN_HOME, LOGIN_PATH, SESSION_COOKIE } from "@/lib/auth";
  * rejects any request without a valid token. A forged or expired cookie gets
  * you the login screen again, never data.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hasSession = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
 

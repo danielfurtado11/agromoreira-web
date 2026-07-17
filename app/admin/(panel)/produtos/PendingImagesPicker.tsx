@@ -22,9 +22,15 @@ export function PendingImagesPicker({
   const [previews, setPreviews] = useState<string[]>([]);
 
   // Object URLs are a manual resource: create one per file and release them
-  // when the selection changes or this unmounts, or the blobs leak.
+  // when the selection changes or this unmounts, or the blobs leak. They must
+  // be created in the effect (which only runs on commit), not during render or
+  // in `useMemo` — that way every allocated URL is guaranteed a matching
+  // revoke, even under Strict Mode's double render. The single `setPreviews`
+  // re-render here is intentional and bounded, not the cascade the lint rule
+  // guards against.
   useEffect(() => {
     const urls = files.map((file) => URL.createObjectURL(file));
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above
     setPreviews(urls);
     return () => urls.forEach(URL.revokeObjectURL);
   }, [files]);

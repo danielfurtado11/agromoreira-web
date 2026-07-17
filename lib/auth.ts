@@ -1,9 +1,10 @@
-// Session constants, shared by the middleware, the login/logout actions and
-// the admin pages.
+// Session constants, shared by the proxy, the login/logout actions and the
+// admin pages.
 //
-// This module is deliberately free of `next/headers` (and any other Node-only
-// import): the middleware runs in the Edge runtime and imports SESSION_COOKIE
-// from here, so pulling server-only APIs in would break it.
+// This module is deliberately free of `next/headers` (and any other
+// request-scoped server API): the proxy imports SESSION_COOKIE from here and
+// runs outside a request/render context, so pulling those APIs in would break
+// it.
 
 /**
  * Name of the httpOnly cookie holding the admin's JWT. httpOnly means the
