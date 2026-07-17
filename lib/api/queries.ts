@@ -10,9 +10,14 @@ import type {
   Product,
   ProductDetail,
   Store,
+  Unit,
 } from "./types";
 
-/** Public catalogue products, with optional filters. */
+/**
+ * Public catalogue products, with optional filters. Only ever returns visible
+ * products — listing hidden ones needs a token, so that lives in
+ * `lib/api/admin.ts` instead.
+ */
 export function getProducts(params?: {
   categoryId?: number;
   featured?: boolean;
@@ -33,6 +38,11 @@ export function getProduct(id: number): Promise<ProductDetail> {
 /** All categories (the site navigation is built from these). */
 export function getCategories(): Promise<Category[]> {
   return apiFetch<Category[]>("/categories");
+}
+
+/** Units a product can be sold in (kg, saco 25kg, unidade, ...). */
+export function getUnits(): Promise<Unit[]> {
+  return apiFetch<Unit[]>("/units");
 }
 
 /** News feed posts. */

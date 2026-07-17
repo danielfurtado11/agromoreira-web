@@ -3,9 +3,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { isAdmin } from "@/lib/api/admin";
 import { ApiError } from "@/lib/api/client";
 import { getProduct } from "@/lib/api/queries";
+import { ProductCardMenu } from "@/components/admin/ProductCardMenu";
 import { ProductGallery } from "@/components/ProductGallery";
+import { VideoEmbed } from "@/components/VideoEmbed";
 import { formatPrice } from "@/lib/format";
 
 type Params = Promise<{ id: string }>;
@@ -35,7 +38,7 @@ export async function generateMetadata({
 
 export default async function ProdutoPage({ params }: { params: Params }) {
   const { id } = await params;
-  const product = await loadProduct(id);
+  const [product, admin] = await Promise.all([loadProduct(id), isAdmin()]);
 
   // Cover image first, then the rest by their stored position.
   const images = [...product.images].sort(
@@ -70,9 +73,18 @@ export default async function ProdutoPage({ params }: { params: Params }) {
             {product.category.name}
           </Link>
 
-          <h1 className="mt-3 text-3xl font-bold leading-tight">
-            {product.name}
-          </h1>
+          <div className="mt-3 flex items-start justify-between gap-3">
+            <h1 className="text-3xl font-bold leading-tight">{product.name}</h1>
+            {admin && (
+              <ProductCardMenu
+                productId={product.id}
+                productName={product.name}
+                // Deleting from here leaves nowhere to stand: go back to the
+                // catalogue instead of a 404.
+                afterDeleteHref="/produtos"
+              />
+            )}
+          </div>
 
           <div className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span className="text-3xl font-bold text-primary tabular-nums">
@@ -133,6 +145,18 @@ export default async function ProdutoPage({ params }: { params: Params }) {
           </p>
         </div>
       </div>
+
+      {/* Below the two columns rather than inside the image one: there it was
+          squeezed into half the width. Centred and capped so it does not
+          become huge on a wide screen. */}
+      {product.embed_url && (
+        <div className="mx-auto mt-12 max-w-[820px]">
+          <VideoEmbed
+            url={product.embed_url}
+            title={`Vídeo: ${product.name}`}
+          />
+        </div>
+      )}
     </div>
   );
 }

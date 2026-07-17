@@ -29,10 +29,14 @@ export class ApiError extends Error {
  * The generic `T` tells TypeScript the expected shape of the response.
  */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  // A FormData body (image uploads) must set its own multipart Content-Type,
+  // including the boundary fetch generates — forcing JSON here would corrupt it.
+  const isFormData = init?.body instanceof FormData;
+
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...init?.headers,
     },
   });

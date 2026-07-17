@@ -4,6 +4,7 @@
 // getProducts() itself — the URL is the single source of truth, so no
 // client-side state or "use client" is needed anywhere on this page.
 import type { Metadata } from "next";
+import { isAdmin } from "@/lib/api/admin";
 import { getCategories, getProducts } from "@/lib/api/queries";
 import { CatalogueView } from "@/components/CatalogueView";
 import { ProductCard } from "@/components/ProductCard";
@@ -35,9 +36,12 @@ export default async function ProdutosPage({
   const { categoria } = await searchParams;
   const categoryId = categoria ? Number(categoria) : undefined;
 
-  const [products, categories] = await Promise.all([
+  // `admin` only toggles the edit/remove shortcuts on the cards — the real
+  // access control is the API, which rejects the actions without a valid token.
+  const [products, categories, admin] = await Promise.all([
     getProducts({ categoryId }),
     getCategories(),
+    isAdmin(),
   ]);
 
   const activeCategory = categories.find((c) => c.id === categoryId);
@@ -56,7 +60,11 @@ export default async function ProdutosPage({
         // Below @md the container is narrow, so a plain 2-column grid is used.
         <div className="grid grid-cols-2 gap-5 @md:[grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              adminControls={admin}
+            />
           ))}
         </div>
       ) : (

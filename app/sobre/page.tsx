@@ -7,15 +7,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getAboutUs, getEmployees, getStores } from "@/lib/api/queries";
 import type { Employee, Store } from "@/lib/api/types";
-import {
-  facebookVideoEmbedUrl,
-  getEmbedProvider,
-  getYouTubeId,
-  youTubeEmbedUrl,
-} from "@/lib/embeds";
 import { sortByWeekday } from "@/lib/opening-hours";
 import { ContactPill } from "@/components/ContactPill";
 import { SectionHeading } from "@/components/SectionHeading";
+import { VideoEmbed } from "@/components/VideoEmbed";
 
 export const metadata: Metadata = {
   title: "Sobre nós · AgroMoreira's",
@@ -68,7 +63,10 @@ export default async function SobrePage() {
 
       {about.video_url && (
         <div className="mx-auto mt-10 max-w-[820px]">
-          <AboutVideo url={about.video_url} />
+          <VideoEmbed
+            url={about.video_url}
+            title="Vídeo sobre a Agromoreira"
+          />
         </div>
       )}
 
@@ -120,58 +118,6 @@ export default async function SobrePage() {
       )}
     </div>
   );
-}
-
-/** The about video: an inline player, or a link out for Instagram. */
-function AboutVideo({ url }: { url: string }) {
-  const provider = getEmbedProvider(url);
-
-  if (provider === "youtube") {
-    const videoId = getYouTubeId(url);
-    if (videoId) {
-      return (
-        <div className="relative aspect-video overflow-hidden rounded-2xl bg-mist">
-          <iframe
-            src={youTubeEmbedUrl(videoId)}
-            title="Vídeo sobre a Agromoreira"
-            allow="encrypted-media; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 h-full w-full"
-          />
-        </div>
-      );
-    }
-  }
-
-  if (provider === "facebook") {
-    return (
-      <div className="relative aspect-video overflow-hidden rounded-2xl bg-mist">
-        <iframe
-          src={facebookVideoEmbedUrl(url)}
-          title="Vídeo sobre a Agromoreira"
-          allow="encrypted-media; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full"
-        />
-      </div>
-    );
-  }
-
-  // Instagram cannot be embedded without an API key, so link out instead.
-  if (provider === "instagram") {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-center rounded-2xl border border-line bg-mist px-6 py-10 text-sm font-semibold text-primary transition hover:border-primary"
-      >
-        Ver vídeo no Instagram
-      </a>
-    );
-  }
-
-  return null;
 }
 
 function EmployeeCard({ employee }: { employee: Employee }) {
