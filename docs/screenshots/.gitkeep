@@ -1,0 +1,3 @@
+# Screenshots used in README.md live here (e.g. home.png).
+# This folder is NOT served by Next.js (unlike public/), so the images
+# ship only with the repo, never with the deployed site.
