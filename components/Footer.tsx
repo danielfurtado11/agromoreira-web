@@ -27,10 +27,13 @@ export async function Footer() {
           <p className="text-lg font-bold text-white">
             AgroMoreira&apos;s · AgroFontaínhas
           </p>
-          <p className="mt-2 max-w-xs text-sm text-white/70">
-            Agricultura, ferragens, rações e produtos de limpeza. Empresa
-            familiar ao serviço da região há mais de 30 anos.
-          </p>
+          {/* Institutional tagline, editable in the admin (Sobre → Frase
+              institucional). Hidden until it is filled in. */}
+          {about?.tagline && (
+            <p className="mt-2 max-w-xs text-sm text-white/70">
+              {about.tagline}
+            </p>
+          )}
         </div>
 
         {stores.map((store) => (
