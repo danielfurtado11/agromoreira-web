@@ -72,6 +72,24 @@ export function AboutForm({ about }: { about: AboutUs | null }) {
         </div>
 
         <div>
+          <label htmlFor="tagline" className={LABEL}>
+            Frase institucional (opcional)
+          </label>
+          <textarea
+            id="tagline"
+            name="tagline"
+            rows={3}
+            defaultValue={about?.tagline ?? ""}
+            placeholder="Ex.: Agricultura, ferragens, rações e produtos de limpeza — ao serviço da região há mais de 30 anos."
+            className={INPUT}
+          />
+          <p className="mt-1 text-xs text-ink-soft">
+            Frase curta e permanente sobre a empresa. Ao contrário dos
+            &quot;Avisos&quot;, não desaparece — é um texto fixo de apresentação.
+          </p>
+        </div>
+
+        <div>
           <label htmlFor="video_url" className={LABEL}>
             Vídeo (opcional)
           </label>

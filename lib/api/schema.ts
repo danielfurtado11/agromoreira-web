@@ -549,6 +549,8 @@ export interface components {
         AboutUsRead: {
             /** Id */
             id: number;
+            /** Tagline */
+            tagline: string | null;
             /** Text */
             text: string;
             /** Email */
@@ -565,6 +567,8 @@ export interface components {
          * @description Singleton: the admin form always submits every field.
          */
         AboutUsWrite: {
+            /** Tagline */
+            tagline?: string | null;
             /** Text */
             text: string;
             /** Email */

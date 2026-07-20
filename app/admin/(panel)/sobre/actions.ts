@@ -27,6 +27,7 @@ export async function saveAboutUs(formData: FormData): Promise<ActionResult> {
   // always submits every field; unset optional fields go as null.
   const payload = {
     text,
+    tagline: optionalText(formData, "tagline"),
     email: optionalText(formData, "email"),
     video_url: optionalText(formData, "video_url"),
     facebook_url: optionalText(formData, "facebook_url"),
