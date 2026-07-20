@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { LOGIN_PATH, SESSION_COOKIE } from "@/lib/auth";
 import { ApiError, apiFetch } from "./client";
-import type { Announcement, Post, Product } from "./types";
+import type { Announcement, Brand, Post, Product } from "./types";
 
 /** The signed-in admin's token, or null for a visitor. */
 export async function getSessionToken(): Promise<string | null> {
@@ -74,4 +74,13 @@ export function getAdminPosts(): Promise<Post[]> {
  */
 export function getAdminAnnouncements(): Promise<Announcement[]> {
   return adminFetch<Announcement[]>("/announcements?include_inactive=true");
+}
+
+/**
+ * Every brand, including the hidden ones — for the panel's list. Ordered by
+ * display_order like the public feed. `include_inactive` is token-guarded
+ * (403 otherwise), like posts/products.
+ */
+export function getAdminBrands(): Promise<Brand[]> {
+  return adminFetch<Brand[]>("/brands?include_inactive=true");
 }

@@ -500,6 +500,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/brands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Brands
+         * @description Partner brand logos for the footer carousel.
+         */
+        get: operations["list_brands_brands_get"];
+        put?: never;
+        /**
+         * Create Brand
+         * @description Create a brand. The logo is uploaded separately. Admin only.
+         */
+        post: operations["create_brand_brands_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/brands/{brand_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Brand
+         * @description Delete a brand and its logo. Admin only.
+         */
+        delete: operations["delete_brand_brands__brand_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Brand
+         * @description Partially update a brand. Admin only.
+         */
+        patch: operations["update_brand_brands__brand_id__patch"];
+        trace?: never;
+    };
+    "/brands/{brand_id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Upload Brand Image
+         * @description Set the brand logo, replacing any previous one. Admin only.
+         */
+        put: operations["upload_brand_image_brands__brand_id__image_put"];
+        post?: never;
+        /**
+         * Delete Brand Image
+         * @description Remove the brand logo. Admin only.
+         */
+        delete: operations["delete_brand_image_brands__brand_id__image_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/about-us": {
         parameters: {
             query?: never;
@@ -641,6 +713,14 @@ export interface components {
              */
             client_secret?: string | null;
         };
+        /** Body_upload_brand_image_brands__brand_id__image_put */
+        Body_upload_brand_image_brands__brand_id__image_put: {
+            /**
+             * File
+             * @description JPEG, PNG or WebP, up to 5 MB
+             */
+            file: string;
+        };
         /** Body_upload_employee_image_employees__employee_id__image_put */
         Body_upload_employee_image_employees__employee_id__image_put: {
             /**
@@ -677,6 +757,40 @@ export interface components {
              * @description JPEG, PNG or WebP, up to 5 MB
              */
             file: string;
+        };
+        /** BrandCreate */
+        BrandCreate: {
+            /** Name */
+            name: string;
+            /** Display Order */
+            display_order?: number | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+        };
+        /** BrandRead */
+        BrandRead: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Display Order */
+            display_order: number | null;
+            /** Is Active */
+            is_active: boolean;
+            /** Image Url */
+            readonly image_url: string | null;
+        };
+        /** BrandUpdate */
+        BrandUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Display Order */
+            display_order?: number | null;
+            /** Is Active */
+            is_active?: boolean | null;
         };
         /** CategoryCreate */
         CategoryCreate: {
@@ -2330,6 +2444,201 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PostRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_brands_brands_get: {
+        parameters: {
+            query?: {
+                /** @description Admin only: also return hidden brands */
+                include_inactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_brand_brands_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BrandCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_brand_brands__brand_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brand_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_brand_brands__brand_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brand_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BrandUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_brand_image_brands__brand_id__image_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brand_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_brand_image_brands__brand_id__image_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_brand_image_brands__brand_id__image_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brand_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BrandRead"];
                 };
             };
             /** @description Validation Error */

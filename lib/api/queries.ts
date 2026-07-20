@@ -4,6 +4,7 @@ import { ApiError, apiFetch } from "./client";
 import type {
   AboutUs,
   Announcement,
+  Brand,
   Category,
   Employee,
   Post,
@@ -83,4 +84,12 @@ export async function getAboutUs(): Promise<AboutUs | null> {
 /** Active site-wide announcements (e.g. holiday closures). */
 export function getAnnouncements(): Promise<Announcement[]> {
   return apiFetch<Announcement[]>("/announcements");
+}
+
+/**
+ * Partner brands for the homepage marquee. The API returns only the active
+ * ones, already ordered by display_order (managed in the admin).
+ */
+export function getBrands(): Promise<Brand[]> {
+  return apiFetch<Brand[]>("/brands");
 }

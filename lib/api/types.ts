@@ -23,3 +23,6 @@ export type Employee = Schemas["EmployeeRead"];
 export type Post = Schemas["PostRead"];
 export type Announcement = Schemas["AnnouncementRead"];
 export type AboutUs = Schemas["AboutUsRead"];
+
+// Brands (partner logos in the homepage marquee)
+export type Brand = Schemas["BrandRead"];

@@ -23,7 +23,12 @@ const QUIET_BUTTON =
   "rounded-full border border-line px-4 py-2 text-sm font-semibold text-ink-soft transition hover:border-primary hover:text-primary disabled:opacity-60";
 const DANGER_BUTTON =
   "rounded-full border border-line px-4 py-2 text-sm font-semibold text-red-700 transition hover:border-red-300 hover:bg-red-50 disabled:opacity-60";
-const THUMB = "h-24 w-32 rounded-lg border border-line object-cover";
+const THUMB_BASE = "h-24 w-32 rounded-lg border border-line";
+
+/** Thumbnail classes: photos crop to fill, logos read better contained. */
+function thumbClass(fit: "cover" | "contain"): string {
+  return `${THUMB_BASE} ${fit === "contain" ? "object-contain" : "object-cover"}`;
+}
 
 /** Accepted upload types, kept in step with the API's allowed image types. */
 const ACCEPT = "image/jpeg,image/png,image/webp";
@@ -34,11 +39,17 @@ export function PendingPhotoField({
   file,
   onChange,
   hint,
+  label = "Fotografia",
+  fit = "cover",
 }: {
   file: File | null;
   onChange: (file: File | null) => void;
   /** One line under the label, e.g. "É enviada ao criar a loja." */
   hint: string;
+  /** Field heading; defaults to "Fotografia" (brands pass "Logótipo"). */
+  label?: string;
+  /** How the preview is fitted; logos use "contain" so nothing is cropped. */
+  fit?: "cover" | "contain";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -56,13 +67,13 @@ export function PendingPhotoField({
 
   return (
     <div>
-      <p className={LABEL}>Fotografia</p>
+      <p className={LABEL}>{label}</p>
       <p className="mt-1 text-xs text-ink-soft">{hint}</p>
 
       <div className="mt-3 flex flex-wrap items-start gap-4">
         {preview && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="" className={THUMB} />
+          <img src={preview} alt="" className={thumbClass(fit)} />
         )}
 
         <div className="flex flex-wrap gap-2">
@@ -108,6 +119,8 @@ export function SavedPhotoField({
   idField,
   uploadAction,
   deleteAction,
+  label = "Fotografia",
+  fit = "cover",
 }: {
   entityId: number;
   entityName: string;
@@ -116,6 +129,10 @@ export function SavedPhotoField({
   idField: string;
   uploadAction: ImageAction;
   deleteAction: ImageAction;
+  /** Field heading; defaults to "Fotografia" (brands pass "Logótipo"). */
+  label?: string;
+  /** How the image is fitted; logos use "contain" so nothing is cropped. */
+  fit?: "cover" | "contain";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -142,15 +159,15 @@ export function SavedPhotoField({
 
   return (
     <div>
-      <p className={LABEL}>Fotografia</p>
+      <p className={LABEL}>{label}</p>
 
       <div className="mt-2 flex flex-wrap items-start gap-4">
         {imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageUrl}
-            alt={`Fotografia de ${entityName}`}
-            className={THUMB}
+            alt={`${label} de ${entityName}`}
+            className={thumbClass(fit)}
           />
         )}
 
